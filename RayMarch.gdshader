@@ -1,10 +1,14 @@
 shader_type spatial;
 
+
 uniform int stepCount = 1;
 uniform sampler2D debugRainbow;
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler2D scene_texture : hint_screen_texture;
-varying vec3 position;
+
+varying bool shown;
+varying vec3 currPos;
+
 float sdfSphere(vec3 point, vec3 sphere_position, float sphere_scale)
 {
 	return distance(point,sphere_position) - sphere_scale;
@@ -19,9 +23,15 @@ float sdfCube(vec3 p,vec3 o,float scale)
 	float adj = max(max(abs(p.x-o.x),abs(p.y-o.y)),abs(p.z-o.z));
 	return adj - scale;
 }
+float sceneSDF(vec3 p)
+{
+	float sphereDis = sdfSphere(p,vec3(0.0,1.0,0.0),0.25);
+	float squareDis = sdfCube(p,vec3(0.0,-1.0,0.0),0.5);
+	float torusDis = sdTorus(p,vec2(0.5,0.1));
+	return min(sphereDis,min(squareDis,torusDis));
+}
 void vertex() {
-	//POSITION = vec4(VERTEX,1.0);
-	position = (MODEL_MATRIX * vec4(VERTEX,1.0)).xyz;
+	POSITION = vec4(VERTEX,0.0);
 }
 
 void fragment() {
@@ -41,14 +51,16 @@ void fragment() {
 	////set alpha to 0 initially
 	int currStep = 0;
 	float trueDepth = 0.0;
+	bool overshot;
+	bool undershot;
 	for(int i = 0;i<stepCount;i++)
 	{
-		float sd = sdTorus(pixel_position,vec2(0.5,0.1));
-		bool overshot = sd > 10000.0; //arbitrarily large value
-		bool undershot = abs(sd) < 0.001; //arbitrarily small value
+		float sd = sceneSDF(pixel_position);
+		overshot = sd > 10000.0; //arbitrarily large value
+		undershot = abs(sd) < 0.001; //arbitrarily small value
 		float shouldEnd = float(!(overshot || undershot)); //1 if chill, 0 if not
 		
-		vec3 color = vec3(trueDepth * 0.1);
+		vec3 color = vec3(1.0);
 		//weird way of doing a shader-style 
 		ALBEDO = float(undershot) * (color)  + float(!undershot) * texture(scene_texture,SCREEN_UV).rgb;
 		
@@ -56,12 +68,25 @@ void fragment() {
 		pixel_position +=  view_dir * sd * shouldEnd;
 		trueDepth += sd * shouldEnd;
 		//pixel_position += -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * sd;
-		currStep ++;
-
+		currStep += int(!overshot);
+		
 	}
+	currPos = pixel_position;
+	EMISSION = vec3(float(overshot) * ALBEDO);
 }
 
 void light() {
 	//disables lighting effects, but allows for control
-	DIFFUSE_LIGHT = vec3(1.0);
+	SPECULAR_LIGHT = vec3(0.0);
+	vec3 lightDir = (INV_VIEW_MATRIX * vec4(LIGHT,0.0)).xyz;
+	bool hitObj = false;
+	vec3 pixelPosition = currPos;
+	for(int i=0;i<stepCount;i++)
+	{
+		float sd = sceneSDF(pixelPosition);
+		hitObj = abs(sd) < 0.0001;
+		
+		pixelPosition += lightDir * sd * float(!hitObj);
+	}
+	DIFFUSE_LIGHT = vec3(float(!hitObj) * ATTENUATION);
 }
