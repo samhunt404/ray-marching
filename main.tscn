@@ -1,0 +1,45 @@
+[gd_scene load_steps=8 format=3 uid="uid://c2omgp0p3fkrs"]
+
+[ext_resource type="Shader" path="res://RayMarch.gdshader" id="1_eaepd"]
+[ext_resource type="Script" path="res://CameraControl.gd" id="1_jayw3"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_i7kbs"]
+sky_material = SubResource("ProceduralSkyMaterial_4sbdb")
+
+[sub_resource type="Environment" id="Environment_lhd3g"]
+background_mode = 2
+sky = SubResource("Sky_i7kbs")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
+render_priority = 0
+shader = ExtResource("1_eaepd")
+shader_parameter/stepCount = 1000
+
+[sub_resource type="QuadMesh" id="QuadMesh_hw68g"]
+flip_faces = true
+size = Vector2(2, 2)
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lhd3g")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+current = true
+script = ExtResource("1_jayw3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_ofkpr")
+mesh = SubResource("QuadMesh_hw68g")
