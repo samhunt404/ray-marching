@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c2omgp0p3fkrs"]
+[gd_scene load_steps=10 format=3 uid="uid://c2omgp0p3fkrs"]
 
 [ext_resource type="Shader" path="res://RayMarch.gdshader" id="1_eaepd"]
 [ext_resource type="Script" path="res://CameraControl.gd" id="1_jayw3"]
@@ -16,14 +16,21 @@ sky = SubResource("Sky_i7kbs")
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="Gradient" id="Gradient_ckurg"]
+offsets = PackedFloat32Array(0, 0.249169, 0.496678, 0.719269, 1)
+colors = PackedColorArray(1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0.968627, 1, 1, 0, 0, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_y08wr"]
+gradient = SubResource("Gradient_ckurg")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/stepCount = 1000
+shader_parameter/stepCount = 259
+shader_parameter/debugRainbow = SubResource("GradientTexture1D_y08wr")
 
-[sub_resource type="QuadMesh" id="QuadMesh_hw68g"]
+[sub_resource type="SphereMesh" id="SphereMesh_x67oh"]
 flip_faces = true
-size = Vector2(2, 2)
 
 [node name="Main" type="Node3D"]
 
@@ -40,6 +47,6 @@ current = true
 script = ExtResource("1_jayw3")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(2.285, 0, 0, 0, 2.285, 0, 0, 0, 2.285, 0, 0, 0)
 material_override = SubResource("ShaderMaterial_ofkpr")
-mesh = SubResource("QuadMesh_hw68g")
+mesh = SubResource("SphereMesh_x67oh")
