@@ -1,10 +1,12 @@
 shader_type spatial;
+render_mode unshaded;
 
-
-uniform int stepCount = 1;
+uniform int stepCount = 100;
+uniform float tolerance = 0.001;
 uniform sampler2D debugRainbow;
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler2D scene_texture : hint_screen_texture;
+uniform sampler3D SceneScalarField;
 
 varying bool shown;
 varying vec3 currPos;
@@ -28,10 +30,20 @@ float sceneSDF(vec3 p)
 	float sphereDis = sdfSphere(p,vec3(0.0,1.0,0.0),0.25);
 	float squareDis = sdfCube(p,vec3(0.0,-1.0,0.0),0.5);
 	float torusDis = sdTorus(p,vec2(0.5,0.1));
-	return min(sphereDis,min(squareDis,torusDis));
+	//this small constant is just 1/256, slightly easier to multiply vectors than devide
+	//normalzes position to uv
+	vec3 adjPos = p * 0.00390625;
+	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
+	float clip = float(max(max(adjPos.x,adjPos.y),adjPos.z) < 1.0 && min(min(adjPos.x,adjPos.y),adjPos.z) > 0.0);
+	float raw = texture(SceneScalarField,p * 0.00390625).x;
+	float signed = (raw - 0.5) * clip; 
+	//I imagine you can scale this signed value and it just scales the litteral size of the scene, though I don't know that to be true
+	
+	return signed;
+	//return min(min(sphereDis,torusDis),squareDis);
 }
 void vertex() {
-	POSITION = vec4(VERTEX,0.0);
+	//POSITION = vec4(VERTEX,0.0);
 }
 
 void fragment() {
@@ -57,10 +69,10 @@ void fragment() {
 	{
 		float sd = sceneSDF(pixel_position);
 		overshot = sd > 10000.0; //arbitrarily large value
-		undershot = abs(sd) < 0.001; //arbitrarily small value
+		undershot = abs(sd) < tolerance; //arbitrarily small value
 		float shouldEnd = float(!(overshot || undershot)); //1 if chill, 0 if not
 		
-		vec3 color = vec3(1.0);
+		vec3 color = texture(debugRainbow,vec2(trueDepth * 0.001)).xyz;
 		//weird way of doing a shader-style 
 		ALBEDO = float(undershot) * (color)  + float(!undershot) * texture(scene_texture,SCREEN_UV).rgb;
 		
@@ -76,17 +88,21 @@ void fragment() {
 }
 
 void light() {
-	//disables lighting effects, but allows for control
-	SPECULAR_LIGHT = vec3(0.0);
-	vec3 lightDir = (INV_VIEW_MATRIX * vec4(LIGHT,0.0)).xyz;
-	bool hitObj = false;
-	vec3 pixelPosition = currPos;
-	for(int i=0;i<stepCount;i++)
-	{
-		float sd = sceneSDF(pixelPosition);
-		hitObj = abs(sd) < 0.0001;
-		
-		pixelPosition += lightDir * sd * float(!hitObj);
-	}
-	DIFFUSE_LIGHT = vec3(float(!hitObj) * ATTENUATION);
+	DIFFUSE_LIGHT = vec3(1.0);
+	////disables lighting effects, but allows for control
+	//SPECULAR_LIGHT = vec3(0.0);
+	//vec3 lightDir = (INV_VIEW_MATRIX * vec4(LIGHT,0.0)).xyz;
+	//bool hitObj = false;
+	////slight offset to reduce artefacts, smaller values create more banding but are more accurate
+	////it seems like there's a math function which would offset it perfectly as the artefacts are predictable
+	////but I'm really bad at calculus (or trig, genuinely can't tell with this problem)
+	//vec3 pixelPosition = currPos;
+	//for(int i=0;i<stepCount;i++)
+	//{
+		//float sd = sceneSDF(pixelPosition);
+		//hitObj = abs(sd) < 0.0001;
+		//
+		//pixelPosition += lightDir * sd * float(!hitObj);
+	//}
+	//DIFFUSE_LIGHT = vec3(float(!hitObj));
 }

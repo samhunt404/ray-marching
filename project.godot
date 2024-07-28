@@ -14,6 +14,10 @@ config/name="RayMarching"
 config/features=PackedStringArray("4.2", "Forward Plus")
 config/icon="res://icon.svg"
 
+[editor]
+
+movie_writer/movie_file="C:/Users/Sam/Documents/RayMarching/ray-marching/RecordedVideos/RayMarchTest1.avi"
+
 [input]
 
 Hold_Control={

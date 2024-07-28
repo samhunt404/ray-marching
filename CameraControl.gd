@@ -4,6 +4,7 @@ var controlToggle := false
 @export var sensitivity := 0.5
 @export var speed := 20.0
 
+
 func _process(delta):
 	var x := float(Input.is_action_pressed("right")) - float(Input.is_action_pressed("left"))
 	var y := float(Input.is_action_pressed("up")) - float(Input.is_action_pressed("down"))

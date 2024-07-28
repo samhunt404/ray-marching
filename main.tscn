@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://c2omgp0p3fkrs"]
+[gd_scene load_steps=11 format=3 uid="uid://c2omgp0p3fkrs"]
 
 [ext_resource type="Shader" path="res://RayMarch.gdshader" id="1_eaepd"]
 [ext_resource type="Script" path="res://CameraControl.gd" id="1_jayw3"]
+[ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://SceneSD.tres" id="2_hy4ym"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -26,27 +27,26 @@ gradient = SubResource("Gradient_ckurg")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/stepCount = 259
+shader_parameter/stepCount = 500
+shader_parameter/tolerance = 0.001
 shader_parameter/debugRainbow = SubResource("GradientTexture1D_y08wr")
+shader_parameter/SceneScalarField = ExtResource("2_hy4ym")
 
-[sub_resource type="QuadMesh" id="QuadMesh_0gxl4"]
+[sub_resource type="BoxMesh" id="BoxMesh_0ccva"]
 flip_faces = true
-size = Vector2(2, 2)
+size = Vector3(256, 256, 256)
 
 [node name="Main" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_lhd3g")
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 128, 128)
+material_override = SubResource("ShaderMaterial_ofkpr")
+mesh = SubResource("BoxMesh_0ccva")
+
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+transform = Transform3D(-0.979276, 0, 0.202531, 0, 1, 0, -0.202531, 0, -0.979276, 0, 0, -4.40345)
 current = true
 script = ExtResource("1_jayw3")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(3.76, 0, 0, 0, 3.76, 0, 0, 0, 3.76, 0, 0, -0.728038)
-material_override = SubResource("ShaderMaterial_ofkpr")
-mesh = SubResource("QuadMesh_0gxl4")
-
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.26278, 1.93055, -1.40327)
