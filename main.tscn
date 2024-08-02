@@ -27,8 +27,11 @@ gradient = SubResource("Gradient_ckurg")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/stepCount = 500
+shader_parameter/stepCount = 700
 shader_parameter/tolerance = 0.001
+shader_parameter/minDis = 0.001
+shader_parameter/col = Color(0.701961, 0.435294, 0.192157, 1)
+shader_parameter/env_col = Color(0.416321, 0.0880994, 0.171117, 1)
 shader_parameter/debugRainbow = SubResource("GradientTexture1D_y08wr")
 shader_parameter/SceneScalarField = ExtResource("2_hy4ym")
 
