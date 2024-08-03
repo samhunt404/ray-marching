@@ -2,19 +2,16 @@ shader_type spatial;
 render_mode unshaded;
 const vec3 DIR = normalize(vec3(0.25,1,0.25));
 const float DERRIV_STEP = 0.01;
-uniform int stepCount = 500;
-uniform float tolerance = 0.001;
-uniform float minDis = 0.001;
+const float RESOLUTION = 0.00390625;
+uniform int stepCount = 100;
+uniform float tolerance = 0.01;
 uniform vec3 col : source_color;
 uniform vec3 env_col : source_color;
 
-uniform sampler2D debugRainbow;
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler2D scene_texture : hint_screen_texture;
 uniform sampler3D SceneScalarField;
 
-varying bool shown;
-varying vec3 currPos;
 
 float sdfSphere(vec3 point, vec3 sphere_position, float sphere_scale)
 {
@@ -32,15 +29,11 @@ float sdfCube(vec3 p,vec3 o,float scale)
 }
 float sceneSDF(vec3 p)
 {
-	float sphereDis = sdfSphere(p,vec3(0.0,1.0,0.0),0.25);
-	float squareDis = sdfCube(p,vec3(0.0,-1.0,0.0),0.5);
-	float torusDis = sdTorus(p,vec2(0.5,0.1));
-	//this small constant is just 1/256, slightly easier to multiply vectors than devide
-	//normalzes position to uv
-	vec3 adjPos = p * 0.00390625;
+	vec3 adjP = p+0.5;
 	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
-	float clip = float(max(max(adjPos.x,adjPos.y),adjPos.z) < 1.0 && min(min(adjPos.x,adjPos.y),adjPos.z) > 0.0);
-	float raw = texture(SceneScalarField,p * 0.00390625).x;
+	float clip = float(max(max(adjP.x,adjP.y),adjP.z) < 1.0 && min(min(adjP.x,adjP.y),adjP.z) > 0.0);
+	//convert p from object to texture space
+	float raw = texture(SceneScalarField,adjP).x;
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
 	float signed = (raw - 0.5) * clip + (1.0 - clip); 
 	//I imagine you can scale this signed value and it just scales the litteral size of the scene, though I don't know that to be true
@@ -67,13 +60,13 @@ void fragment() {
 	view_coords.xyz /= view_coords.w;
 
 	vec3 world_pos = (INV_VIEW_MATRIX * vec4(view_coords.xyz, 1.0)).xyz;
+	//do math in object space
 	vec3 obj_position = (inverse(MODEL_MATRIX) * vec4(world_pos, 1.0)).xyz;
-
 	vec3 cam_pos = (inverse(MODEL_MATRIX) * INV_VIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-	vec3 view_dir = normalize(obj_position - cam_pos);
+	vec3 view_dir = -(inverse(MODEL_MATRIX) * INV_VIEW_MATRIX * vec4(VIEW,0.0)).xyz;
 	
-	//get current position of pixel in world space
-	vec3 pixel_position = CAMERA_POSITION_WORLD;
+	//get current position of pixel in obect space
+	vec3 pixel_position = cam_pos;
 	////set alpha to 0 initially
 	int currStep = 0;
 	float trueDepth = 0.0;
@@ -83,14 +76,13 @@ void fragment() {
 	for(int i = 0;i<stepCount;i++)
 	{
 		float sd = sceneSDF(pixel_position);
-		overshot = sd > 10000.0; //arbitrarily large value
+		overshot = sd > 256.0; //arbitrarily large value
 		undershot = abs(sd) < tolerance; //arbitrarily small value
 		shouldEnd = float(!(overshot || undershot)); //1 if chill, 0 if not
 		
 
-		
 		//pixel_position +=  -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * 0.001;
-		pixel_position +=  view_dir * sd * shouldEnd;
+		pixel_position += view_dir * sd * shouldEnd;
 		trueDepth += sd * shouldEnd;
 		//pixel_position += -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * sd;
 		currStep += int(!overshot);
@@ -98,8 +90,8 @@ void fragment() {
 	}
 	vec3 color = clamp(dot(DIR,sceneNormal(pixel_position)) * col + env_col,vec3(0.0),vec3(1.0));
 	//weird way of doing a shader-style 
-	ALBEDO = float(undershot) * (color)  + float(!undershot) * texture(scene_texture,SCREEN_UV).rgb;
-	currPos = pixel_position;
+	ALPHA = float(undershot);
+	ALBEDO = (color);
 	EMISSION = vec3(float(overshot) * ALBEDO);
 }
 

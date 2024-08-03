@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://c2omgp0p3fkrs"]
+[gd_scene load_steps=9 format=3 uid="uid://c2omgp0p3fkrs"]
 
 [ext_resource type="Shader" path="res://RayMarch.gdshader" id="1_eaepd"]
 [ext_resource type="Script" path="res://CameraControl.gd" id="1_jayw3"]
@@ -17,27 +17,17 @@ sky = SubResource("Sky_i7kbs")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Gradient" id="Gradient_ckurg"]
-offsets = PackedFloat32Array(0, 0.249169, 0.496678, 0.719269, 1)
-colors = PackedColorArray(1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0.968627, 1, 1, 0, 0, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_y08wr"]
-gradient = SubResource("Gradient_ckurg")
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
 shader_parameter/stepCount = 700
-shader_parameter/tolerance = 0.001
-shader_parameter/minDis = 0.001
+shader_parameter/tolerance = 0.1
 shader_parameter/col = Color(0.701961, 0.435294, 0.192157, 1)
 shader_parameter/env_col = Color(0.416321, 0.0880994, 0.171117, 1)
-shader_parameter/debugRainbow = SubResource("GradientTexture1D_y08wr")
 shader_parameter/SceneScalarField = ExtResource("2_hy4ym")
 
 [sub_resource type="BoxMesh" id="BoxMesh_0ccva"]
 flip_faces = true
-size = Vector3(256, 256, 256)
 
 [node name="Main" type="Node3D"]
 
@@ -45,7 +35,7 @@ size = Vector3(256, 256, 256)
 environment = SubResource("Environment_lhd3g")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 128, 128)
+transform = Transform3D(256, 0, 0, 0, 256, 0, 0, 0, 256, 0, 128, 0)
 material_override = SubResource("ShaderMaterial_ofkpr")
 mesh = SubResource("BoxMesh_0ccva")
 
