@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://c2omgp0p3fkrs"]
+[gd_scene load_steps=10 format=3 uid="uid://c2omgp0p3fkrs"]
 
 [ext_resource type="Shader" path="res://RayMarch.gdshader" id="1_eaepd"]
 [ext_resource type="Script" path="res://CameraControl.gd" id="1_jayw3"]
 [ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://SceneSD.tres" id="2_hy4ym"]
+[ext_resource type="Script" path="res://chunk.gd" id="3_gpe10"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -38,6 +39,7 @@ environment = SubResource("Environment_lhd3g")
 transform = Transform3D(256, 0, 0, 0, 256, 0, 0, 0, 256, 0, 128, 0)
 material_override = SubResource("ShaderMaterial_ofkpr")
 mesh = SubResource("BoxMesh_0ccva")
+script = ExtResource("3_gpe10")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-0.979276, 0, 0.202531, 0, 1, 0, -0.202531, 0, -0.979276, 0, 0, -4.40345)
