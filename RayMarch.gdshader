@@ -2,14 +2,13 @@ shader_type spatial;
 render_mode unshaded;
 const vec3 DIR = normalize(vec3(0.25,1,0.25));
 const float DERRIV_STEP = 0.01;
-const float RESOLUTION = 0.00390625;
+uniform float minStep =  0.001;
 uniform int stepCount = 100;
 uniform float tolerance = 0.01;
 uniform vec3 col : source_color;
 uniform vec3 env_col : source_color;
 
 uniform sampler2D depth_texture : hint_depth_texture;
-uniform sampler2D scene_texture : hint_screen_texture;
 uniform sampler3D SceneScalarField;
 
 
@@ -29,13 +28,14 @@ float sdfCube(vec3 p,vec3 o,float scale)
 }
 float sceneSDF(vec3 p)
 {
-	vec3 adjP = p+0.5;
+	vec3 adjP = p+vec3(0.5);
 	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
 	float clip = float(max(max(adjP.x,adjP.y),adjP.z) < 1.0 && min(min(adjP.x,adjP.y),adjP.z) > 0.0);
 	//convert p from object to texture space
-	float raw = texture(SceneScalarField,adjP).x;
+	float raw = texture(SceneScalarField,adjP,1.0).x;
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
-	float signed = (raw) * clip + (1.0 - clip); 
+	float signed = (raw) * clip + (0.5 - clip);
+	signed *= 2.0; 
 	//I imagine you can scale this signed value and it just scales the litteral size of the scene, though I don't know that to be true
 	
 	return signed;
@@ -54,7 +54,7 @@ void vertex() {
 }
 
 void fragment() {
-	vec3 lightDir = (vec4(DIR,0.0)).xyz;	
+	vec3 lightDir = (inverse(MODEL_MATRIX) * vec4(DIR,0.0)).xyz;	
 	float depth = texture(depth_texture, SCREEN_UV).x;
 	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth * 2.0 - 1.0);
 	vec4 view_coords = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
@@ -83,13 +83,13 @@ void fragment() {
 		
 
 		//pixel_position +=  -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * 0.001;
-		pixel_position += view_dir * sd * shouldEnd;
+		pixel_position += (view_dir * max(sd,minStep) * shouldEnd);
 		trueDepth += sd * shouldEnd;
 		//pixel_position += -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * sd;
 		currStep += int(!overshot);
 		
 	}
-	vec3 color = clamp(dot(lightDir,sceneNormal(pixel_position)) * col + env_col,vec3(0.0),vec3(1.0));
+	vec3 color = clamp(dot(lightDir,sceneNormal(pixel_position) * 10.0) * col + env_col,vec3(0.0),vec3(1.0));
 	//weird way of doing a shader-style 
 	ALPHA = float(undershot);
 	ALBEDO = (color);

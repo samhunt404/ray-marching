@@ -22,6 +22,7 @@ glow_enabled = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
+shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 700
 shader_parameter/tolerance = 0.1
 shader_parameter/col = Color(0.701961, 0.435294, 0.192157, 1)
@@ -37,7 +38,8 @@ flip_faces = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkgym"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/stepCount = 250
+shader_parameter/minStep = 0.001
+shader_parameter/stepCount = 75
 shader_parameter/tolerance = 0.01
 shader_parameter/col = Color(0.799347, 0.362017, 0.453015, 1)
 shader_parameter/env_col = null
@@ -61,6 +63,6 @@ current = true
 script = ExtResource("1_jayw3")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-8, 0, 6.99382e-07, 0, 8, 0, -6.99382e-07, 0, -8, 8.9824, 0, 0.5)
+transform = Transform3D(7.98106, -0.548684, -0.0411499, 0.54955, 7.9193, 0.991291, -0.0272548, -0.991771, 7.93824, 8.9824, 0, 0.5)
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_jkgym")
