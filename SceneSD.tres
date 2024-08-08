@@ -1,12 +1,11 @@
 [gd_resource type="NoiseTexture3D" load_steps=3 format=3 uid="uid://dm4vqea4an8sx"]
 
 [sub_resource type="Gradient" id="Gradient_yorj7"]
-offsets = PackedFloat32Array(0, 0.6)
+offsets = PackedFloat32Array(0.1, 0.4)
 metadata/_snap_enabled = true
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_3v1c8"]
 noise_type = 0
-fractal_octaves = 3
 
 [resource]
 width = 256

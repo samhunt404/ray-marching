@@ -35,7 +35,7 @@ float sceneSDF(vec3 p)
 	//convert p from object to texture space
 	float raw = texture(SceneScalarField,adjP).x;
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
-	float signed = (raw - 0.5) * clip + (1.0 - clip); 
+	float signed = (raw) * clip + (1.0 - clip); 
 	//I imagine you can scale this signed value and it just scales the litteral size of the scene, though I don't know that to be true
 	
 	return signed;
@@ -54,6 +54,7 @@ void vertex() {
 }
 
 void fragment() {
+	vec3 lightDir = (vec4(DIR,0.0)).xyz;	
 	float depth = texture(depth_texture, SCREEN_UV).x;
 	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth * 2.0 - 1.0);
 	vec4 view_coords = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
@@ -88,7 +89,7 @@ void fragment() {
 		currStep += int(!overshot);
 		
 	}
-	vec3 color = clamp(dot(DIR,sceneNormal(pixel_position)) * col + env_col,vec3(0.0),vec3(1.0));
+	vec3 color = clamp(dot(lightDir,sceneNormal(pixel_position)) * col + env_col,vec3(0.0),vec3(1.0));
 	//weird way of doing a shader-style 
 	ALPHA = float(undershot);
 	ALBEDO = (color);

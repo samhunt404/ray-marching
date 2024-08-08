@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3 uid="uid://debmbcirmpccr"]
+
+[ext_resource type="Script" path="res://Scripts/GrowTester.gd" id="1_u1x1r"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_xjc6o"]
+radius = 1.0
+
+[node name="Area3D" type="Area3D"]
+script = ExtResource("1_u1x1r")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_xjc6o")
+
+[node name="-Y" type="RayCast3D" parent="."]
+hit_from_inside = true
+debug_shape_custom_color = Color(0.826976, 0.225941, 0.250911, 1)
+debug_shape_thickness = 4
+
+[node name="Y" type="RayCast3D" parent="."]
+target_position = Vector3(0, 1, 0)
+hit_from_inside = true
+debug_shape_custom_color = Color(0.826976, 0.225941, 0.250911, 1)
+debug_shape_thickness = 4
+
+[node name="-X" type="RayCast3D" parent="."]
+target_position = Vector3(-1, 0, 0)
+hit_from_inside = true
+debug_shape_custom_color = Color(0.826976, 0.225941, 0.250911, 1)
+debug_shape_thickness = 4
+
+[node name="X" type="RayCast3D" parent="."]
+target_position = Vector3(1, 0, 0)
+hit_from_inside = true
+debug_shape_custom_color = Color(0.826976, 0.225941, 0.250911, 1)
+debug_shape_thickness = 4
+
+[node name="-Z" type="RayCast3D" parent="."]
+target_position = Vector3(0, 0, -1)
+hit_from_inside = true
+debug_shape_custom_color = Color(0.826976, 0.225941, 0.250911, 1)
+debug_shape_thickness = 4
+
+[node name="Z" type="RayCast3D" parent="."]
+target_position = Vector3(0, 0, 1)
+hit_from_inside = true
+debug_shape_custom_color = Color(0.826976, 0.225941, 0.250911, 1)
+debug_shape_thickness = 4
