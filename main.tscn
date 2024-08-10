@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="1_jayw3"]
 [ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://SceneSD.tres" id="2_hy4ym"]
 [ext_resource type="Script" path="res://Scripts/chunk.gd" id="3_gpe10"]
-[ext_resource type="ImageTexture3D" uid="uid://d4hx1hrq5fgdr" path="res://test.tres" id="7_vpm57"]
+[ext_resource type="ImageTexture3D" uid="uid://dgcqo1s4k258h" path="res://test.tres" id="7_vpm57"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -22,11 +22,12 @@ glow_enabled = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
+shader_parameter/DERRIV_STEP = 0.005
 shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 700
 shader_parameter/tolerance = 0.1
-shader_parameter/col = Color(0.701961, 0.435294, 0.192157, 1)
-shader_parameter/env_col = Color(0.416321, 0.0880994, 0.171117, 1)
+shader_parameter/col = Color(0.909804, 0.203922, 0.117647, 1)
+shader_parameter/env_col = Color(0.298258, 0.130264, 0.159658, 1)
 shader_parameter/SceneScalarField = ExtResource("2_hy4ym")
 
 [sub_resource type="BoxMesh" id="BoxMesh_0ccva"]
@@ -38,11 +39,12 @@ flip_faces = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkgym"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/minStep = 0.001
-shader_parameter/stepCount = 75
-shader_parameter/tolerance = 0.01
-shader_parameter/col = Color(0.799347, 0.362017, 0.453015, 1)
-shader_parameter/env_col = null
+shader_parameter/DERRIV_STEP = 0.0625
+shader_parameter/minStep = 0.0
+shader_parameter/stepCount = 100
+shader_parameter/tolerance = 0.075
+shader_parameter/col = Color(0.803542, 0.391656, 0.15376, 1)
+shader_parameter/env_col = Color(0.243137, 0.00784314, 0.282353, 1)
 shader_parameter/SceneScalarField = ExtResource("7_vpm57")
 
 [node name="Main" type="Node3D"]
@@ -63,6 +65,6 @@ current = true
 script = ExtResource("1_jayw3")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(7.98106, -0.548684, -0.0411499, 0.54955, 7.9193, 0.991291, -0.0272548, -0.991771, 7.93824, 8.9824, 0, 0.5)
+transform = Transform3D(7.98106, -0.548684, -0.0411499, 0.461885, 6.35578, 4.8364, -0.299016, -4.82732, 6.37241, 8.9824, 0, 0.5)
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_jkgym")

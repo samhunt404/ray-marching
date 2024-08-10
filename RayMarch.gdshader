@@ -1,7 +1,7 @@
 shader_type spatial;
 render_mode unshaded;
 const vec3 DIR = normalize(vec3(0.25,1,0.25));
-const float DERRIV_STEP = 0.01;
+uniform float DERRIV_STEP = 0.0625;
 uniform float minStep =  0.001;
 uniform int stepCount = 100;
 uniform float tolerance = 0.01;
@@ -9,7 +9,7 @@ uniform vec3 col : source_color;
 uniform vec3 env_col : source_color;
 
 uniform sampler2D depth_texture : hint_depth_texture;
-uniform sampler3D SceneScalarField;
+uniform sampler3D SceneScalarField : filter_nearest;
 
 
 float sdfSphere(vec3 point, vec3 sphere_position, float sphere_scale)

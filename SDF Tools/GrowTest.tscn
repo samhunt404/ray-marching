@@ -1,16 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://debmbcirmpccr"]
+[gd_scene load_steps=2 format=3 uid="uid://debmbcirmpccr"]
 
-[ext_resource type="Script" path="res://Scripts/GrowTester.gd" id="1_u1x1r"]
+[ext_resource type="Script" path="res://Scripts/ThreadedGrower.gd" id="2_emyr4"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_xjc6o"]
-radius = 1.0
-
-[node name="Area3D" type="Area3D"]
-script = ExtResource("1_u1x1r")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("SphereShape3D_xjc6o")
-
-[node name="RayCast3D" type="RayCast3D" parent="."]
-hit_from_inside = true
-debug_shape_custom_color = Color(0.788235, 0, 0, 1)
+[node name="Grower" type="Node3D"]
+script = ExtResource("2_emyr4")

@@ -6,6 +6,7 @@ var dis : float
 var tex : Image
 var coord : Vector2i
 var positive := false
+
 signal collided
 
 # Called when the node enters the scene tree for the first time.
