@@ -1,6 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://debmbcirmpccr"]
+[gd_scene load_steps=3 format=3 uid="uid://debmbcirmpccr"]
 
-[ext_resource type="Script" path="res://Scripts/ThreadedGrower.gd" id="2_emyr4"]
+[ext_resource type="Script" path="res://Scripts/ThreadedGrower.gd" id="1_svhx1"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_g7j4a"]
+size = Vector3(0.03, 0.03, 0.03)
 
 [node name="Grower" type="Node3D"]
-script = ExtResource("2_emyr4")
+script = ExtResource("1_svhx1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_g7j4a")

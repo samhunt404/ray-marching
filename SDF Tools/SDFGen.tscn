@@ -24,7 +24,7 @@ backface_collision = true
 
 [node name="SDFGen" type="Node3D"]
 script = ExtResource("1_phqpw")
-size = 64
+size = 128
 growTester = ExtResource("2_xkxj8")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -38,10 +38,11 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.594, 0.5, 0.542)
 
 [node name="UtahTeapot" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.145, 0, 0, 0, 0.145, 0, 0, 0, 0.145, 0.481973, 0.156251, 0.447999)
+transform = Transform3D(0.148492, 0, -0.148492, 0, 0.21, 0, 0.148492, 0, 0.148492, 0.479968, 0.205153, 0.473738)
 mesh = ExtResource("3_42u4e")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="UtahTeapot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="UtahTeapot/StaticBody3D"]
 shape = SubResource("ConcavePolygonShape3D_qmjem")

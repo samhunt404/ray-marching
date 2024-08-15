@@ -16,7 +16,7 @@ config/icon="res://icon.svg"
 
 [editor]
 
-movie_writer/movie_file="C:/Users/Sam/Documents/RayMarching/ray-marching/RecordedVideos/RayMarchTest1.avi"
+movie_writer/movie_file="C:/Users/perdi/OneDrive/Documents/RayMarching/RayMarchTest1.avi"
 
 [input]
 

@@ -1,50 +1,64 @@
-extends Area3D
+class_name GrowTester extends Area3D
 
-@onready var coll = $CollisionShape3D
-@onready var ray = $RayCast3D
-var dis : float
-var tex : Image
+@onready var coll := $CollisionShape3D
+@onready var ray := $RayCast3D
+var index := 0
+var res = 0.004
 var coord : Vector2i
-var positive := false
+var tex : Image
+var texIndex := 0
 
-signal collided
+var foundNearest := false
+var currDis := 0.0
 
-# Called when the node enters the scene tree for the first time.
+var foundSign := false
+var collCount := 0
+@onready var currentPos := global_position
+
+signal pixelReady
+
+var currentlyWriting = false
 func _ready() -> void:
-	scale = Vector3.ONE * 0.01
+	coll.scale = Vector3.ONE * 0.001
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _physics_process(_delta: float) -> void:
-	if(get_overlapping_bodies().size() == 0 and scale.x < 1):
-		scale += Vector3.ONE * 0.02
-		dis = scale.x #scale should be uniform
-	else:
-		#test if point is a positive (outside) or negative (inside)
-		var spaceRid := get_world_3d().space
-		var space := PhysicsServer3D.space_get_direct_state(spaceRid)
-		#use global coordinnates
-		var query := PhysicsRayQueryParameters3D.create(global_position,global_position + Vector3(0,0,5.0))
-		query.hit_back_faces = true
-		query.collide_with_areas = false
-		var result := space.intersect_ray(query)
-		var numCol := 0
-		var last_result
-		while(not result.is_empty()):
-			numCol += 1
-			var newStart = result.position			
-			query.from = newStart
-			query.to = newStart + Vector3(0.0,0.0,5.0)
-			last_result = result
-			result = space.intersect_ray(query)
-			
-		positive = (numCol % 2 == 0)
-		if positive:
-			dis += 0.5
+func _physics_process(_delta) -> void:
+	if not foundSign:
+		ray.global_position = currentPos
+		ray.target_position = Vector3(0,0,5)
+		ray.force_raycast_update()
+		if(ray.is_colliding()):
+			collCount += 1
+			currentPos = ray.get_collision_point()
+			return
 		else:
-			dis = 0.5 - dis
-		dis = clamp(dis,0,1)
-		tex.set_pixel(coord.x,coord.y,Color(dis,dis,dis))
-		collided.emit()
-		queue_free()
-		pass
+			foundSign = true
+	if not foundNearest:
+		var s = 1 if collCount % 2 == 0 else -1
+		coll.scale += Vector3.ONE * res * s
+		if(coll.scale.x > 1.5 || get_overlapping_bodies().size() > 0):
+			foundNearest = true
+			currDis = coll.scale.x
+		else:
+			return
+	if foundNearest and foundSign and not currentlyWriting:
+		currentlyWriting = true
+		_write_texture()
+
+
+func _write_texture() -> void:
+	var dis := currDis
+	if(collCount % 2 == 0):
+		dis = dis + 0.5
+	else:
+		dis = 0.5 - dis
+	var color = Color.WHITE
+	color.v = dis
+	tex.set_pixel(coord.x,coord.y,color)
+	pixelReady.emit(index)
+
+func _reset() -> void:
+	foundSign = false
+	ray.global_position = global_position
+	foundNearest = false
+	currentlyWriting = false
+	pass

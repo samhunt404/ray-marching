@@ -1,12 +1,11 @@
 shader_type spatial;
 render_mode unshaded;
-const vec3 DIR = normalize(vec3(0.25,1,0.25));
-uniform float DERRIV_STEP = 0.0625;
+const vec3 DIR = normalize(vec3(0.75,1,0.25));
 uniform float minStep =  0.001;
 uniform int stepCount = 100;
 uniform float tolerance = 0.01;
-uniform vec3 col : source_color;
-uniform vec3 env_col : source_color;
+
+uniform vec3 base_col : source_color;
 
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler3D SceneScalarField : filter_nearest;
@@ -39,13 +38,13 @@ float sceneSDF(vec3 p)
 	//I imagine you can scale this signed value and it just scales the litteral size of the scene, though I don't know that to be true
 	
 	return signed;
-	//return min(min(sphereDis,torusDis),squareDis);
 }
 vec3 sceneNormal(vec3 p)
 {
-	vec3 norm = vec3(sceneSDF(p + vec3(DERRIV_STEP,0.0,0.0)) - sceneSDF(p - vec3(DERRIV_STEP,0.0,0.0)),
-					sceneSDF(p + vec3(0.0,DERRIV_STEP,0.0)) - sceneSDF(p - vec3(0.0,DERRIV_STEP,0.0)),
-					sceneSDF(p + vec3(0.0,0.0,DERRIV_STEP)) - sceneSDF(p - vec3(0.0,0.0,DERRIV_STEP)));
+	float devStep = 1.0/float(textureSize(SceneScalarField,0).x);
+	vec3 norm = vec3(sceneSDF(p + vec3(devStep,0.0,0.0)) - sceneSDF(p - vec3(devStep,0.0,0.0)),
+					sceneSDF(p + vec3(0.0,devStep,0.0)) - sceneSDF(p - vec3(0.0,devStep,0.0)),
+					sceneSDF(p + vec3(0.0,0.0,devStep)) - sceneSDF(p - vec3(0.0,0.0,devStep)));
 	norm = normalize(norm);
 	return clamp(norm,normalize(vec3(-1.0)),normalize(vec3(1.0)));
 }
@@ -60,9 +59,7 @@ void fragment() {
 	vec4 view_coords = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
 	view_coords.xyz /= view_coords.w;
 
-	vec3 world_pos = (INV_VIEW_MATRIX * vec4(view_coords.xyz, 1.0)).xyz;
 	//do math in object space
-	vec3 obj_position = (inverse(MODEL_MATRIX) * vec4(world_pos, 1.0)).xyz;
 	vec3 cam_pos = (inverse(MODEL_MATRIX) * INV_VIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
 	vec3 view_dir = -(inverse(MODEL_MATRIX) * INV_VIEW_MATRIX * vec4(VIEW,0.0)).xyz;
 	
@@ -76,6 +73,7 @@ void fragment() {
 	float shouldEnd = 1.0;
 	for(int i = 0;i<stepCount;i++)
 	{
+		//float sd = sceneSDF(pixel_position);
 		float sd = sceneSDF(pixel_position);
 		overshot = sd > 256.0; //arbitrarily large value
 		undershot = abs(sd) < tolerance; //arbitrarily small value
@@ -89,7 +87,12 @@ void fragment() {
 		currStep += int(!overshot);
 		
 	}
-	vec3 color = clamp(dot(lightDir,sceneNormal(pixel_position) * 10.0) * col + env_col,vec3(0.0),vec3(1.0));
+	vec3 color = base_col;
+	//diffuse
+	
+	//spec
+	
+	
 	//weird way of doing a shader-style 
 	ALPHA = float(undershot);
 	ALBEDO = (color);
@@ -98,20 +101,5 @@ void fragment() {
 
 void light() {
 	DIFFUSE_LIGHT = vec3(1.0);
-	////disables lighting effects, but allows for control
-	//SPECULAR_LIGHT = vec3(0.0);
-	//vec3 lightDir = (INV_VIEW_MATRIX * vec4(LIGHT,0.0)).xyz;
-	//bool hitObj = false;
-	////slight offset to reduce artefacts, smaller values create more banding but are more accurate
-	////it seems like there's a math function which would offset it perfectly as the artefacts are predictable
-	////but I'm really bad at calculus (or trig, genuinely can't tell with this problem)
-	//vec3 pixelPosition = currPos;
-	//for(int i=0;i<stepCount;i++)
-	//{
-		//float sd = sceneSDF(pixelPosition);
-		//hitObj = abs(sd) < 0.0001;
-		//
-		//pixelPosition += lightDir * sd * float(!hitObj);
-	//}
-	//DIFFUSE_LIGHT = vec3(float(!hitObj));
+	
 }

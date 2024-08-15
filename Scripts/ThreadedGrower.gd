@@ -1,72 +1,83 @@
-extends Node3D
+class_name ThreadedGrower extends Node3D
 
-var thread : Thread
+
+var rayQuery : PhysicsRayQueryParameters3D
+var collQuery : PhysicsShapeQueryParameters3D
+
+var index := 0
+var res = 0.004
 var coord : Vector2i
 var tex : Image
+var texIndex := 0
 
-@onready var nodeTransform := global_transform
-@onready var currentPosition := global_position
-var dis := 0.0
-var intersectCount := 0
-var query : PhysicsRayQueryParameters3D
-var result : Dictionary
-var foundPositive := false
+var foundNearest := false
+var currDis := 0.0
 
-var space_state : PhysicsDirectSpaceState3D
-signal collided
-func  _ready() -> void:
-	query = PhysicsRayQueryParameters3D.create(global_position,global_position + Vector3(0,0,5))
-func _physics_process(_delta: float) -> void:
-	get_distance()
+var foundSign := false
+var collCount := 0
+@onready var currentPos := global_position
 
-#func _physics_process(_delta: float) -> void:
-	#get_distance()
+signal pixelReady
+
+var currentlyWriting = false
+func _ready() -> void:
+	collQuery = PhysicsShapeQueryParameters3D.new()
+	collQuery.shape = SphereShape3D.new()
+	collQuery.shape.radius = 0.001
+	collQuery.transform.origin = currentPos
 	
+	rayQuery = PhysicsRayQueryParameters3D.create(currentPos,currentPos + Vector3(0,0,5))
+	rayQuery.collide_with_bodies = true
+	rayQuery.hit_back_faces = true
+	rayQuery.hit_from_inside = true
 
-func get_distance() -> void:
-	var space_rid := get_world_3d().space
-	space_state = PhysicsServer3D.space_get_direct_state(space_rid)
-	var sresult : Array
-	var foundEnd = false
-	if dis < 1.5 and not foundEnd:
-		var shape := SphereShape3D.new()
-		shape.radius = dis
-		var squery := PhysicsShapeQueryParameters3D.new()
-		squery.shape = shape
-		squery.transform = nodeTransform
+func _physics_process(_delta) -> void:
+	var space_state := get_world_3d().direct_space_state
+	if not foundSign:
+		rayQuery.from = currentPos + Vector3(0,0,0.01)
+		rayQuery.to = currentPos + Vector3(0,0,5)
+		var collisionData = space_state.intersect_ray(rayQuery)
 		
-		sresult = space_state.intersect_shape(squery)
-		if(sresult.size() > 0):
-			foundEnd = true
+		if(collisionData.is_empty()):
+			foundSign = true
 		else:
-			dis += 0.01
+			collCount += 1
+			currentPos = collisionData.position
 			return
-	
-	var positive := false
-	#from and to in global coordinates
-	#don't run the condition if we never hit the collider
-	
-	if not foundPositive:
-		#march slightly forward to prevent getting stuck on a surface
-		query.from = currentPosition + Vector3(0,0,0.001)
-		query.to = currentPosition + Vector3(0,0,5)
-		result = space_state.intersect_ray(query)
-		
-		if(result.is_empty()):
-			foundPositive = true
+
+	if not foundNearest:
+		collQuery.transform.origin = global_position
+		collQuery.shape.radius += res
+		var collisionData = space_state.intersect_shape(collQuery)
+		if(collQuery.shape.radius > 1.5 || collisionData.size() > 0):
+			foundNearest = true
+			currDis = collQuery.shape.radius
 		else:
-			currentPosition = result.position
-			intersectCount += 1
 			return
-	#even number of collisions means ray started outside the mesh
-	positive = (intersectCount % 2 == 0)
-	var color := Color.WHITE
-	
-	if(positive):
-		color.v = dis + 0.5
+	if foundNearest and foundSign and not currentlyWriting:
+		currentlyWriting = true
+		_write_texture()
+
+
+func _write_texture() -> void:
+	var dis := currDis
+	if(collCount % 2 == 0):
+		dis = dis + 0.5
 	else:
-		color.v = 0.5 - dis
+		dis = 0.5 - dis
+	var color = Color.WHITE
+	color.v = dis
 	tex.set_pixel(coord.x,coord.y,color)
+	pixelReady.emit(index)
+
+func _reset() -> void:
+	foundSign = false
+	rayQuery.from = global_position
+	rayQuery.to = global_position + Vector3(0,0,5)
+	currentPos = global_position
+	collCount = 0
 	
-	collided.emit()
-	queue_free()
+	collQuery.shape.radius = 0.001
+	foundNearest = false
+	currentlyWriting = false
+	pass
