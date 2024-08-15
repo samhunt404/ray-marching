@@ -42,4 +42,3 @@ func _increment_pixel(i : int) ->void:
 		print("saved_image")
 		
 		get_tree().quit()
-

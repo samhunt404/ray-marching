@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://c2omgp0p3fkrs"]
+[gd_scene load_steps=15 format=3 uid="uid://c2omgp0p3fkrs"]
 
 [ext_resource type="Shader" path="res://RayMarch.gdshader" id="1_eaepd"]
 [ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="1_jayw3"]
 [ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://SceneSD.tres" id="2_hy4ym"]
 [ext_resource type="Script" path="res://Scripts/chunk.gd" id="3_gpe10"]
-[ext_resource type="ImageTexture3D" uid="uid://cmoqgibmlas8v" path="res://outtest.tres" id="5_lwjk4"]
+[ext_resource type="ImageTexture3D" uid="uid://cmoqgibmlas8v" path="res://UtahTeapotSDF.tres" id="5_lwjk4"]
+[ext_resource type="ImageTexture3D" path="res://outtest.tres" id="6_f72qc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -22,10 +23,11 @@ glow_enabled = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
+shader_parameter/smoothing = 8.0
 shader_parameter/minStep = 0.007
-shader_parameter/stepCount = 250
+shader_parameter/stepCount = 75
 shader_parameter/tolerance = 0.07
-shader_parameter/base_col = null
+shader_parameter/base_col = Color(0.428554, 0.100708, 0.10998, 1)
 shader_parameter/SceneScalarField = ExtResource("2_hy4ym")
 
 [sub_resource type="BoxMesh" id="BoxMesh_0ccva"]
@@ -34,33 +36,58 @@ flip_faces = true
 [sub_resource type="BoxMesh" id="BoxMesh_c38cw"]
 flip_faces = true
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_32ypy"]
+render_priority = 0
+shader = ExtResource("1_eaepd")
+shader_parameter/smoothing = 8.0
+shader_parameter/minStep = 0.016
+shader_parameter/stepCount = 100
+shader_parameter/tolerance = 0.062
+shader_parameter/base_col = Color(0.692855, 0.59562, 0.559564, 1)
+shader_parameter/SceneScalarField = ExtResource("5_lwjk4")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkgym"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/minStep = 0.007
+shader_parameter/smoothing = 8.0
+shader_parameter/minStep = 0.016
 shader_parameter/stepCount = 100
-shader_parameter/tolerance = 0.035
-shader_parameter/base_col = Color(1, 0.2, 0.2, 1)
-shader_parameter/SceneScalarField = ExtResource("5_lwjk4")
+shader_parameter/tolerance = 0.062
+shader_parameter/base_col = Color(0.779932, 0.482357, 0, 1)
+shader_parameter/SceneScalarField = ExtResource("6_f72qc")
 
 [node name="Main" type="Node3D"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.564332, 0.466955, -0.680795, 0.619353, 0.305765, 0.723125, 0.54583, -0.829735, -0.116656, 8.06194, 8.98956, 0)
+light_color = Color(1, 0.917647, 0.752941, 1)
+light_energy = 0.895
+light_angular_distance = 5.6
+shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_lhd3g")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 28, 0)
-visible = false
+[node name="env" type="MeshInstance3D" parent="."]
+transform = Transform3D(25.5999, 0.00642406, -0.0580568, -0.00641556, 25.6, 0.00375323, 0.0580577, -0.00373867, 25.5999, 0, 12.8, 0)
 material_override = SubResource("ShaderMaterial_ofkpr")
 mesh = SubResource("BoxMesh_0ccva")
 script = ExtResource("3_gpe10")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -1.90101, 0.52893, 0.525021)
+visible = false
 current = true
 script = ExtResource("1_jayw3")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-6.49463, 0, 4.67116, 0, 8, 0, -4.67116, 0, -6.49463, 0.0958118, 3.12982, 0.128758)
+transform = Transform3D(-6.49463, 0, 4.67116, 0, 8, 0, -4.67116, 0, -6.49463, 6.29755, 3.12982, -2.44115)
+visible = false
+mesh = SubResource("BoxMesh_c38cw")
+surface_material_override/0 = SubResource("ShaderMaterial_32ypy")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(8, 0, 0, 0, -3.49691e-07, -8, 0, 8, -3.49691e-07, 0.0958118, 3.12982, 0.128758)
+visible = false
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_jkgym")

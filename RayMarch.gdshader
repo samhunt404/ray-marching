@@ -1,6 +1,7 @@
 shader_type spatial;
-render_mode unshaded;
+
 const vec3 DIR = normalize(vec3(0.75,1,0.25));
+uniform float smoothing = 8.0;
 uniform float minStep =  0.001;
 uniform int stepCount = 100;
 uniform float tolerance = 0.01;
@@ -41,12 +42,24 @@ float sceneSDF(vec3 p)
 }
 vec3 sceneNormal(vec3 p)
 {
-	float devStep = 1.0/float(textureSize(SceneScalarField,0).x);
-	vec3 norm = vec3(sceneSDF(p + vec3(devStep,0.0,0.0)) - sceneSDF(p - vec3(devStep,0.0,0.0)),
-					sceneSDF(p + vec3(0.0,devStep,0.0)) - sceneSDF(p - vec3(0.0,devStep,0.0)),
-					sceneSDF(p + vec3(0.0,0.0,devStep)) - sceneSDF(p - vec3(0.0,0.0,devStep)));
+	float devStep = 1.0/float(textureSize(SceneScalarField,0).x) * smoothing;
+	mat3 pplus = mat3(
+		vec3(p + vec3(devStep,0.0,0.0)),
+		vec3(p + vec3(0.0,devStep,0.0)),
+		vec3(p + vec3(0.0,0.0,devStep))
+	);
+	mat3 pminus = mat3(
+		vec3(p - vec3(devStep,0.0,0.0)),
+		vec3(p - vec3(0.0,devStep,0.0)),
+		vec3(p - vec3(0.0,0.0,devStep))
+	);
+	vec3 norm = vec3(sceneSDF(pplus[0]) - sceneSDF(pminus[0]),
+					sceneSDF(pplus[1]) - sceneSDF(pminus[1]),
+					sceneSDF(pplus[2]) - sceneSDF(pminus[2]));
+	//norm = (norm - sceneSDF(p))/devStep;
 	norm = normalize(norm);
-	return clamp(norm,normalize(vec3(-1.0)),normalize(vec3(1.0)));
+	norm = clamp(norm,-1.0,1.0);
+	return norm;
 }
 void vertex() {
 	//POSITION = vec4(VERTEX,0.0);
@@ -88,18 +101,16 @@ void fragment() {
 		
 	}
 	vec3 color = base_col;
-	//diffuse
-	
-	//spec
-	
-	
-	//weird way of doing a shader-style 
+
+	NORMAL = (VIEW_MATRIX * MODEL_MATRIX * vec4(sceneNormal(pixel_position),0.0)).xyz;
+	//alpha to hide parts of mesh which shouldn't be visible (other ways of doing this may be better)
 	ALPHA = float(undershot);
 	ALBEDO = (color);
 	EMISSION = vec3(float(overshot) * ALBEDO);
 }
 
 void light() {
-	DIFFUSE_LIGHT = vec3(1.0);
+	//diffuse
+	DIFFUSE_LIGHT += clamp(dot(NORMAL, LIGHT), 0.0, 1.0) * ATTENUATION * LIGHT_COLOR;
 	
 }
