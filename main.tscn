@@ -5,7 +5,7 @@
 [ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://SceneSD.tres" id="2_hy4ym"]
 [ext_resource type="Script" path="res://Scripts/chunk.gd" id="3_gpe10"]
 [ext_resource type="ImageTexture3D" uid="uid://cmoqgibmlas8v" path="res://UtahTeapotSDF.tres" id="5_lwjk4"]
-[ext_resource type="ImageTexture3D" path="res://outtest.tres" id="6_f72qc"]
+[ext_resource type="ImageTexture3D" path="res://Vase.tres" id="6_f72qc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
