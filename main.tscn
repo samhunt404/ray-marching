@@ -24,7 +24,7 @@ glow_enabled = true
 render_priority = 0
 shader = ExtResource("1_eaepd")
 shader_parameter/smoothing = 8.0
-shader_parameter/minStep = 0.007
+shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 75
 shader_parameter/tolerance = 0.07
 shader_parameter/base_col = Color(0.428554, 0.100708, 0.10998, 1)
@@ -43,15 +43,15 @@ shader_parameter/smoothing = 8.0
 shader_parameter/minStep = 0.016
 shader_parameter/stepCount = 100
 shader_parameter/tolerance = 0.062
-shader_parameter/base_col = Color(0.692855, 0.59562, 0.559564, 1)
+shader_parameter/base_col = Color(0.513217, 0.642933, 0.700388, 1)
 shader_parameter/SceneScalarField = ExtResource("5_lwjk4")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkgym"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
 shader_parameter/smoothing = 8.0
-shader_parameter/minStep = 0.016
-shader_parameter/stepCount = 100
+shader_parameter/minStep = 0.1
+shader_parameter/stepCount = 50
 shader_parameter/tolerance = 0.062
 shader_parameter/base_col = Color(0.779932, 0.482357, 0, 1)
 shader_parameter/SceneScalarField = ExtResource("6_f72qc")
@@ -59,7 +59,7 @@ shader_parameter/SceneScalarField = ExtResource("6_f72qc")
 [node name="Main" type="Node3D"]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.564332, 0.466955, -0.680795, 0.619353, 0.305765, 0.723125, 0.54583, -0.829735, -0.116656, 8.06194, 8.98956, 0)
+transform = Transform3D(0.763292, 0.579494, -0.285606, 0.33893, 0.0171775, 0.940655, 0.55001, -0.814795, -0.183296, 20.9462, 8.98956, 0)
 light_color = Color(1, 0.917647, 0.752941, 1)
 light_energy = 0.895
 light_angular_distance = 5.6
@@ -69,7 +69,8 @@ shadow_enabled = true
 environment = SubResource("Environment_lhd3g")
 
 [node name="env" type="MeshInstance3D" parent="."]
-transform = Transform3D(25.5999, 0.00642406, -0.0580568, -0.00641556, 25.6, 0.00375323, 0.0580577, -0.00373867, 25.5999, 0, 12.8, 0)
+transform = Transform3D(25.5999, 0.00642406, -0.0580568, -0.00641556, 25.6, 0.00375323, 0.0580577, -0.00373867, 25.5999, 0, 0, 0)
+visible = false
 material_override = SubResource("ShaderMaterial_ofkpr")
 mesh = SubResource("BoxMesh_0ccva")
 script = ExtResource("3_gpe10")
@@ -81,13 +82,11 @@ current = true
 script = ExtResource("1_jayw3")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-6.49463, 0, 4.67116, 0, 8, 0, -4.67116, 0, -6.49463, 6.29755, 3.12982, -2.44115)
-visible = false
+transform = Transform3D(-7.24816, 0, 3.38588, 0, 8, 0, -3.38588, 0, -7.24816, 6.29755, 3.12982, -2.44115)
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_32ypy")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
-transform = Transform3D(8, 0, 0, 0, -3.49691e-07, -8, 0, 8, -3.49691e-07, 0.0958118, 3.12982, 0.128758)
-visible = false
+transform = Transform3D(6.02958, -5.25772, -0.0235965, 0.017784, -0.0155084, 7.99997, -5.25774, -6.02961, 4.38306e-07, 0.0958118, 3.12982, -0.134548)
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_jkgym")
