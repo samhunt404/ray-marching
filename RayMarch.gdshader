@@ -1,6 +1,5 @@
 shader_type spatial;
 
-const vec3 DIR = normalize(vec3(0.75,1,0.25));
 uniform float smoothing = 8.0;
 uniform float minStep =  0.001;
 uniform int stepCount = 100;
@@ -66,7 +65,6 @@ void vertex() {
 }
 
 void fragment() {
-	vec3 lightDir = (inverse(MODEL_MATRIX) * vec4(DIR,0.0)).xyz;	
 	float depth = texture(depth_texture, SCREEN_UV).x;
 	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth * 2.0 - 1.0);
 	vec4 view_coords = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
@@ -112,5 +110,6 @@ void fragment() {
 void light() {
 	//diffuse
 	DIFFUSE_LIGHT += clamp(dot(NORMAL, LIGHT), 0.0, 1.0) * ATTENUATION * LIGHT_COLOR;
+	//shadow??
 	
 }

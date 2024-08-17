@@ -7,7 +7,11 @@ metadata/_snap_enabled = true
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_3v1c8"]
 noise_type = 0
+seed = 315
 fractal_octaves = 1
+domain_warp_frequency = 0.025
+domain_warp_fractal_type = 0
+domain_warp_fractal_octaves = 1
 
 [resource]
 width = 256
