@@ -82,7 +82,7 @@ current = true
 script = ExtResource("4_7fx5p")
 
 [node name="brass_vase_01" type="MeshInstance3D" parent="."]
-transform = Transform3D(1.24, 0, 0, 0, -5.42021e-08, -1.24, 0, 1.24, -5.42021e-08, 0.5, 0.5, 0)
+transform = Transform3D(1.03672, 0.481045, 0.481045, -1.53513e-08, 0.876812, -0.876813, -0.6803, 0.733073, 0.733073, 0.349528, 0.180933, 0.226339)
 mesh = SubResource("ArrayMesh_p421b")
 skeleton = NodePath("")
 

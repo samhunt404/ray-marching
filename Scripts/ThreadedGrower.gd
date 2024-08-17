@@ -34,7 +34,7 @@ func _ready() -> void:
 func _physics_process(_delta) -> void:
 	var space_state := get_world_3d().direct_space_state
 	if not foundSign:
-		rayQuery.from = currentPos + Vector3(0,0,0.01)
+		rayQuery.from = currentPos + Vector3(0,0,0)
 		rayQuery.to = currentPos + Vector3(0,0,5)
 		var collisionData = space_state.intersect_ray(rayQuery)
 		
