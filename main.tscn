@@ -82,19 +82,11 @@ current = true
 script = ExtResource("1_jayw3")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-<<<<<<< HEAD
 transform = Transform3D(-6.49463, 0, 4.67116, 0, 8, 0, -4.67116, 0, -6.49463, 6.29755, 3.12982, -2.44115)
-=======
-transform = Transform3D(-7.24816, 0, 3.38588, 0, 8, 0, -3.38588, 0, -7.24816, 6.29755, 3.12982, -2.44115)
->>>>>>> 86e9443a9e824e74ae355ed18d83891f1e520cb8
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_32ypy")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
-<<<<<<< HEAD
-transform = Transform3D(8, 0, 0, 0, -3.49691e-07, -8, 0, 8, -3.49691e-07, 0.0958118, 3.12982, 0.128758)
-=======
 transform = Transform3D(6.02958, -5.25772, -0.0235965, 0.017784, -0.0155084, 7.99997, -5.25774, -6.02961, 4.38306e-07, 0.0958118, 3.12982, -0.134548)
->>>>>>> 86e9443a9e824e74ae355ed18d83891f1e520cb8
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_jkgym")
