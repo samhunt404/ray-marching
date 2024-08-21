@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b6weidvx73gck"
-path.s3tc="res://.godot/imported/brass_vase_01_diff.jpg-7a1571a72ea722f7dbc730082525f859.s3tc.ctex"
+path.s3tc="res://.godot/imported/brass_vase_01_diff.jpg-1579d0121a2a62c9f795d91ee2dfaa20.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://brass_vase_01_diff.jpg"
-dest_files=["res://.godot/imported/brass_vase_01_diff.jpg-7a1571a72ea722f7dbc730082525f859.s3tc.ctex"]
+source_file="res://Assets/Textures/brass_vase_01_diff.jpg"
+dest_files=["res://.godot/imported/brass_vase_01_diff.jpg-1579d0121a2a62c9f795d91ee2dfaa20.s3tc.ctex"]
 
 [params]
 

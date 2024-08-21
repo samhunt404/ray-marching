@@ -1,11 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://c2omgp0p3fkrs"]
+[gd_scene load_steps=18 format=3 uid="uid://c2omgp0p3fkrs"]
 
-[ext_resource type="Shader" path="res://RayMarch.gdshader" id="1_eaepd"]
+[ext_resource type="Shader" path="res://Scripts/Shaders/RayMarch.gdshader" id="1_eaepd"]
 [ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="1_jayw3"]
-[ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://SceneSD.tres" id="2_hy4ym"]
+[ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://Assets/Textures/SceneSD.tres" id="2_hy4ym"]
 [ext_resource type="Script" path="res://Scripts/chunk.gd" id="3_gpe10"]
-[ext_resource type="ImageTexture3D" uid="uid://cmoqgibmlas8v" path="res://UtahTeapotSDF.tres" id="5_lwjk4"]
-[ext_resource type="ImageTexture3D" path="res://Vase.tres" id="6_f72qc"]
+[ext_resource type="ImageTexture3D" path="res://Assets/Textures/outtest.tres" id="5_tsyhq"]
+[ext_resource type="ImageTexture3D" path="res://Assets/Textures/Vase.tres" id="6_f72qc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -20,6 +20,19 @@ sky = SubResource("Sky_i7kbs")
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="Gradient" id="Gradient_bpwun"]
+offsets = PackedFloat32Array(0.00403226, 0.479839, 1)
+colors = PackedColorArray(0.00537428, 0.281104, 0.582156, 1, 0.99725, 0.356986, 0.413979, 1, 0, 0.581391, 0.0908091, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_wh3le"]
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_gvduc"]
+width = 256
+height = 256
+depth = 256
+color_ramp = SubResource("Gradient_bpwun")
+noise = SubResource("FastNoiseLite_wh3le")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ofkpr"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
@@ -27,8 +40,9 @@ shader_parameter/smoothing = 8.0
 shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 75
 shader_parameter/tolerance = 0.07
-shader_parameter/base_col = Color(0.428554, 0.100708, 0.10998, 1)
+shader_parameter/base_col = Color(0.54099, 0.54099, 0.54099, 1)
 shader_parameter/SceneScalarField = ExtResource("2_hy4ym")
+shader_parameter/SceneTex = SubResource("NoiseTexture3D_gvduc")
 
 [sub_resource type="BoxMesh" id="BoxMesh_0ccva"]
 flip_faces = true
@@ -39,18 +53,18 @@ flip_faces = true
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_32ypy"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/smoothing = 8.0
-shader_parameter/minStep = 0.016
-shader_parameter/stepCount = 100
-shader_parameter/tolerance = 0.062
+shader_parameter/smoothing = 1.0
+shader_parameter/minStep = -0.001
+shader_parameter/stepCount = 65
+shader_parameter/tolerance = 0.077
 shader_parameter/base_col = Color(0.513217, 0.642933, 0.700388, 1)
-shader_parameter/SceneScalarField = ExtResource("5_lwjk4")
+shader_parameter/SceneScalarField = ExtResource("5_tsyhq")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkgym"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
 shader_parameter/smoothing = 8.0
-shader_parameter/minStep = 0.1
+shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 50
 shader_parameter/tolerance = 0.062
 shader_parameter/base_col = Color(0.779932, 0.482357, 0, 1)
@@ -69,24 +83,23 @@ shadow_enabled = true
 environment = SubResource("Environment_lhd3g")
 
 [node name="env" type="MeshInstance3D" parent="."]
-transform = Transform3D(25.5999, 0.00642406, -0.0580568, -0.00641556, 25.6, 0.00375323, 0.0580577, -0.00373867, 25.5999, 0, 0, 0)
+transform = Transform3D(25.5997, -0.0154801, -0.117645, 0.0159063, 25.5998, 0.0928536, 0.117588, -0.0929257, 25.5995, 0, 0, 0)
 visible = false
 material_override = SubResource("ShaderMaterial_ofkpr")
 mesh = SubResource("BoxMesh_0ccva")
 script = ExtResource("3_gpe10")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -1.90101, 0.52893, 0.525021)
-visible = false
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -7.976, -0.261, 0.91)
 current = true
 script = ExtResource("1_jayw3")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(-6.49463, 0, 4.67116, 0, 8, 0, -4.67116, 0, -6.49463, 6.29755, 3.12982, -2.44115)
+transform = Transform3D(-3.60273, -3.87394, 6.00108, -2.80179, 6.949, 2.80382, -6.57041, -0.839046, -4.48616, 10.0228, 3.12982, -4.72281)
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_32ypy")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
-transform = Transform3D(6.02958, -5.25772, -0.0235965, 0.017784, -0.0155084, 7.99997, -5.25774, -6.02961, 4.38306e-07, 0.0958118, 3.12982, -0.134548)
+transform = Transform3D(-5.90345, 5.14774, 1.6279, -1.22695, 1.06989, -7.83262, -5.25774, -6.02961, 3.44288e-07, 4.09598, 3.12982, -1.61769)
 mesh = SubResource("BoxMesh_c38cw")
 surface_material_override/0 = SubResource("ShaderMaterial_jkgym")

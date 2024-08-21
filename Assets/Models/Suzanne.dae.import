@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://flaip2qns2nm"
-path="res://.godot/imported/Vase.dae-9b3867155a001f4476c3d7c9fbaaf61a.scn"
+uid="uid://yan8ikk2mv8t"
+path="res://.godot/imported/Suzanne.dae-eaba0b4dec4ea8ae7e8298c9eda2ff27.scn"
 
 [deps]
 
-source_file="res://Vase.dae"
-dest_files=["res://.godot/imported/Vase.dae-9b3867155a001f4476c3d7c9fbaaf61a.scn"]
+source_file="res://Assets/Models/Suzanne.dae"
+dest_files=["res://.godot/imported/Suzanne.dae-eaba0b4dec4ea8ae7e8298c9eda2ff27.scn"]
 
 [params]
 

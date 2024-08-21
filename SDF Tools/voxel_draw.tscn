@@ -1,0 +1,119 @@
+[gd_scene load_steps=10 format=3 uid="uid://cgb0tmgxlxf7x"]
+
+[ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="1_7eqvu"]
+[ext_resource type="Script" path="res://SDF Tools/voxel_draw.gd" id="1_tlswa"]
+[ext_resource type="Shader" path="res://Scripts/Shaders/RayMarch.gdshader" id="3_452c3"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_tjmus"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_jpomc"]
+sky_material = SubResource("ProceduralSkyMaterial_tjmus")
+
+[sub_resource type="Environment" id="Environment_qwd8k"]
+background_mode = 2
+sky = SubResource("Sky_jpomc")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1sflr"]
+render_priority = 0
+shader = ExtResource("3_452c3")
+shader_parameter/smoothing = 2.0
+shader_parameter/minStep = 0.001
+shader_parameter/stepCount = 250
+shader_parameter/tolerance = 0.05
+shader_parameter/base_col = Color(1, 1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hekfp"]
+flip_faces = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wn0n6"]
+
+[node name="VoxelDraw" type="Node3D"]
+transform = Transform3D(25, 0, 0, 0, 25, 0, 0, 0, 25, 0, 0, 0)
+script = ExtResource("1_tlswa")
+imageSize = 32
+camera = NodePath("Camera3D")
+cubeMesh = NodePath("MeshInstance3D")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Control/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="CubeBrush" type="Button" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Cube"
+
+[node name="SphereButton" type="Button" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Sphere
+"
+
+[node name="Erase" type="Button" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Erase
+"
+
+[node name="ColorPicker" type="ColorPicker" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+color_mode = 3
+deferred_mode = true
+picker_shape = 3
+
+[node name="VSlider" type="VSlider" parent="CanvasLayer/Control/HBoxContainer"]
+layout_mode = 2
+min_value = 0.05
+max_value = 32.0
+step = 0.01
+value = 0.05
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_qwd8k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.5, 0.5)
+material_override = SubResource("ShaderMaterial_1sflr")
+mesh = SubResource("BoxMesh_hekfp")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+shape = SubResource("BoxShape3D_wn0n6")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.536391, 0.490079, 3.10797)
+script = ExtResource("1_7eqvu")
+
+[connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/CubeBrush" to="." method="_set_square"]
+[connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/SphereButton" to="." method="_set_sphere"]
+[connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/Erase" to="." method="_set_eraser"]
+[connection signal="color_changed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/ColorPicker" to="." method="_set_color"]
+[connection signal="value_changed" from="CanvasLayer/Control/HBoxContainer/VSlider" to="." method="_set_brush_size"]

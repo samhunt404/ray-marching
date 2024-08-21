@@ -9,7 +9,7 @@ uniform vec3 base_col : source_color;
 
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler3D SceneScalarField : filter_nearest;
-
+uniform sampler3D SceneTex : filter_nearest;
 
 float sdfSphere(vec3 point, vec3 sphere_position, float sphere_scale)
 {
@@ -31,12 +31,12 @@ float sceneSDF(vec3 p)
 	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
 	float clip = float(max(max(adjP.x,adjP.y),adjP.z) < 1.0 && min(min(adjP.x,adjP.y),adjP.z) > 0.0);
 	//convert p from object to texture space
-	float raw = texture(SceneScalarField,adjP,1.0).x;
+	float raw = texture(SceneScalarField,adjP,1.0).r;
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
 	float signed = (raw) * clip + (0.5 - clip);
-	signed *= 2.0; 
+	signed *= 2.0;
 	//I imagine you can scale this signed value and it just scales the litteral size of the scene, though I don't know that to be true
-	
+
 	return signed;
 }
 vec3 sceneNormal(vec3 p)
@@ -73,7 +73,7 @@ void fragment() {
 	//do math in object space
 	vec3 cam_pos = (inverse(MODEL_MATRIX) * INV_VIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
 	vec3 view_dir = -(inverse(MODEL_MATRIX) * INV_VIEW_MATRIX * vec4(VIEW,0.0)).xyz;
-	
+
 	//get current position of pixel in obect space
 	vec3 pixel_position = cam_pos;
 	////set alpha to 0 initially
@@ -89,16 +89,16 @@ void fragment() {
 		overshot = sd > 256.0; //arbitrarily large value
 		undershot = abs(sd) < tolerance; //arbitrarily small value
 		shouldEnd = float(!(overshot || undershot)); //1 if chill, 0 if not
-		
+
 
 		//pixel_position +=  -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * 0.001;
 		pixel_position += (view_dir * max(sd,minStep) * shouldEnd);
 		trueDepth += sd * shouldEnd;
 		//pixel_position += -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * sd;
 		currStep += int(!overshot);
-		
+
 	}
-	vec3 color = base_col;
+	vec3 color = texture(SceneTex,(pixel_position + 1.0)/2.0).rgb * base_col;
 
 	NORMAL = (VIEW_MATRIX * MODEL_MATRIX * vec4(sceneNormal(pixel_position),0.0)).xyz;
 	//alpha to hide parts of mesh which shouldn't be visible (other ways of doing this may be better)
@@ -111,5 +111,5 @@ void light() {
 	//diffuse
 	DIFFUSE_LIGHT += clamp(dot(NORMAL, LIGHT), 0.0, 1.0) * ATTENUATION * LIGHT_COLOR;
 	//shadow??
-	
+
 }

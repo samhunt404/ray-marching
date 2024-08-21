@@ -41,4 +41,4 @@ func _increment_pixel(i : int) ->void:
 		ResourceSaver.save(outTex,"res://outtest.tres")
 		print("saved_image")
 		
-		get_tree().quit()
+		get_tree().call_deferred("quit")
