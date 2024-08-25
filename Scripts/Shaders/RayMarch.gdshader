@@ -8,7 +8,6 @@ uniform float tolerance = 0.01;
 uniform vec3 base_col : source_color;
 
 uniform sampler2D depth_texture : hint_depth_texture;
-uniform sampler3D SceneScalarField : filter_nearest;
 uniform sampler3D SceneTex : filter_nearest;
 
 float sdfSphere(vec3 point, vec3 sphere_position, float sphere_scale)
@@ -31,7 +30,7 @@ float sceneSDF(vec3 p)
 	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
 	float clip = float(max(max(adjP.x,adjP.y),adjP.z) < 1.0 && min(min(adjP.x,adjP.y),adjP.z) > 0.0);
 	//convert p from object to texture space
-	float raw = texture(SceneScalarField,adjP,1.0).r;
+	float raw = texture(SceneTex,adjP,1.0).a;
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
 	float signed = (raw) * clip + (0.5 - clip);
 	signed *= 2.0;
@@ -41,7 +40,7 @@ float sceneSDF(vec3 p)
 }
 vec3 sceneNormal(vec3 p)
 {
-	float devStep = 1.0/float(textureSize(SceneScalarField,0).x) * smoothing;
+	float devStep = 1.0/float(textureSize(SceneTex,0).x) * smoothing;
 	mat3 pplus = mat3(
 		vec3(p + vec3(devStep,0.0,0.0)),
 		vec3(p + vec3(0.0,devStep,0.0)),

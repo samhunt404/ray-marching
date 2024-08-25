@@ -19,13 +19,11 @@ var brushSize : float
 var brushType : Brush = Brush.Sphere
 var brushColor : Color
 
-var colorTex : ImageTexture3D
-var sdfTex : ImageTexture3D
+var SceneTex : ImageTexture3D
 
 var rd : RenderingDevice
 
-var col_tex_rid : RID
-var sdf_tex_rid : RID
+var scene_tex_id : RID
 var transformBuffer : RID
 
 
@@ -48,7 +46,7 @@ func _init_gpu() -> void:
 
 	#unsure about all these formats, but it seems to function
 	var sdfFormat = RDTextureFormat.new()
-	sdfFormat.format = RenderingDevice.DATA_FORMAT_R8_UNORM
+	sdfFormat.format = RenderingDevice.DATA_FORMAT_R8G8B8A8_UNORM
 	sdfFormat.texture_type = RenderingDevice.TEXTURE_TYPE_3D
 	sdfFormat.width = imageSize
 	sdfFormat.height = imageSize
@@ -59,42 +57,19 @@ func _init_gpu() -> void:
 			RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 			
 	#prep texture buffer, data will be set later
-	sdf_tex_rid = rd.texture_create(sdfFormat,RDTextureView.new())
+	scene_tex_id = rd.texture_create(sdfFormat,RDTextureView.new())
 	var sdf_uniform := RDUniform.new()
 	sdf_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
 	
 	sdf_uniform.binding = 0 #matches the binding in the compute shader
-	sdf_uniform.add_id(sdf_tex_rid)
+	sdf_uniform.add_id(scene_tex_id)
 	var byteArr = PackedByteArray([])
 	for i in range(imageSize):
-		var sdfBytes = sdfTex.get_data()[i].get_data()
+		var sdfBytes = SceneTex.get_data()[i].get_data()
 		byteArr.append_array(sdfBytes)
-	rd.texture_update(sdf_tex_rid,0,byteArr)
+	rd.texture_update(scene_tex_id,0,byteArr)
 	
-	var colFormat = RDTextureFormat.new()
-	colFormat.format = RenderingDevice.DATA_FORMAT_R8G8B8A8_UNORM
-	colFormat.texture_type = RenderingDevice.TEXTURE_TYPE_3D
-	colFormat.width = imageSize
-	colFormat.height = imageSize
-	colFormat.depth = imageSize
-	colFormat.usage_bits = \
-			RenderingDevice.TEXTURE_USAGE_STORAGE_BIT + \
-			RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT + \
-			RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
-	
-	col_tex_rid = rd.texture_create(colFormat,RDTextureView.new())
-	var col_uniform := RDUniform.new()
-	col_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
-	col_uniform.binding = 1
-	col_uniform.add_id(col_tex_rid)
-	byteArr = PackedByteArray([])
-	
-	for i in range(imageSize):
-		var colBytes = colorTex.get_data()[i].get_data()
-		byteArr.append_array(colBytes)
-	rd.texture_update(col_tex_rid,0,byteArr)
-	
-	uniform_set = rd.uniform_set_create([sdf_uniform,col_uniform],shader,0)
+	uniform_set = rd.uniform_set_create([sdf_uniform],shader,0)
 	pipeline = rd.compute_pipeline_create(shader)
 
 func _pass_buffer(pos : Vector3) -> void:
@@ -132,48 +107,31 @@ func _pass_buffer(pos : Vector3) -> void:
 	rd.submit()
 	#should probably not call sync right after
 	rd.sync()
-	var tempSDFData = rd.texture_get_data(sdf_tex_rid,0)
-	var tempColData = rd.texture_get_data(col_tex_rid,0)
+	var tempSDFData = rd.texture_get_data(scene_tex_id,0)
 	var SDFImgArr = Array([])
-	var colImgArr = Array([])
 	for i in range(imageSize):
-		var cropSDFData = tempSDFData.slice(i * imageSize * imageSize, (i + 1) * imageSize * imageSize)
-		var SDFImg = Image.create_from_data(imageSize,imageSize,false,Image.FORMAT_R8,cropSDFData)
+		var cropSDFData = tempSDFData.slice(i * 4 * imageSize * imageSize, (i + 1) * 4 * imageSize * imageSize)
+		var SDFImg = Image.create_from_data(imageSize,imageSize,false,Image.FORMAT_RGBA8,cropSDFData)
 		SDFImgArr.append(SDFImg)
 		#multiply by 4 here to account for the r g b a chanels
-		var cropColData = tempColData.slice(i * 4 * imageSize * imageSize, (i + 1) * 4 * imageSize * imageSize)
-		var colImg = Image.create_from_data(imageSize,imageSize,false,Image.FORMAT_RGBA8,cropColData)
-		colImgArr.append(colImg)
-	sdfTex.update(SDFImgArr)
-	colorTex.update(colImgArr)
+	SceneTex.update(SDFImgArr)
 
 func _ready() -> void:
 	
 	var arr := Array([])
 	arr.resize(imageSize)
 	#create a temprorary texture
-	var dummyTex := Image.create(imageSize,imageSize,false,Image.FORMAT_R8)
-	dummyTex.fill(Color.WHITE)
+	var dummyTex := Image.create(imageSize,imageSize,false,Image.FORMAT_RGBA8)
+	dummyTex.fill(Color(0,0,0,1.0))
 	arr.fill(dummyTex)
-	sdfTex = ImageTexture3D.new()
+	SceneTex = ImageTexture3D.new()
 	
 	#TODO: test with mipmaps true (also look at CompressedImageTexture3D)
-	sdfTex.create(Image.FORMAT_R8,imageSize,imageSize,imageSize,false,arr)
+	SceneTex.create(Image.FORMAT_RGBA8,imageSize,imageSize,imageSize,false,arr)
 	
-	dummyTex = Image.create(imageSize,imageSize,false,Image.FORMAT_RGBA8)
-	dummyTex.fill(Color.BLACK)
-	arr.fill(dummyTex)
-	
-	colorTex = ImageTexture3D.new()
-	#TODO: same as sdftex
-	colorTex.create(Image.FORMAT_RGBA8,imageSize,imageSize,imageSize,false,arr)
-	
-	activeMesh.get_active_material(0).set_shader_parameter("SceneScalarField",sdfTex)
-	activeMesh.get_active_material(0).set_shader_parameter("SceneTex",colorTex)
-	activeMesh.get_active_material(0).set_shader_parameter("base_col",Color.WHITE)
 	
 	activeMesh.get_active_material(0).set_shader_parameter("minStep",1.0/float(imageSize))
-	
+	activeMesh.get_active_material(0).set_shader_parameter("SceneTex",SceneTex)
 	_init_gpu()
 	
 	
@@ -191,6 +149,9 @@ func _physics_process(_delta: float) -> void:
 			
 		_march(drawPos,(drawPos - query.from).normalized())
 
+func _exit_tree() -> void:
+	ResourceSaver.save(SceneTex,"res://Assets/Textures/WriteTest.tres")
+	
 func _march(pos : Vector3,dir : Vector3) -> void:
 	var result := false
 	var startPixel = to_local(pos)* imageSize
@@ -202,7 +163,7 @@ func _march(pos : Vector3,dir : Vector3) -> void:
 		#constrain cursor
 		currentPixel = currentPixel.maxf(0)
 		currentPixel = currentPixel.minf(imageSize  - 1)
-		var pix := sdfTex.get_data()[int(currentPixel.z)].get_pixel(int(currentPixel.x),int(currentPixel.y)).r
+		var pix := SceneTex.get_data()[int(currentPixel.z)].get_pixel(int(currentPixel.x),int(currentPixel.y)).a
 		pix -= 0.5
 		pix *= 2.0
 		#IN THEORY you can adjust this by the pix value to reduce itteration count

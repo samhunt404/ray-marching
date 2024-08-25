@@ -1,11 +1,8 @@
-[gd_scene load_steps=18 format=3 uid="uid://c2omgp0p3fkrs"]
+[gd_scene load_steps=15 format=3 uid="uid://c2omgp0p3fkrs"]
 
 [ext_resource type="Shader" path="res://Scripts/Shaders/RayMarch.gdshader" id="1_eaepd"]
 [ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="1_jayw3"]
-[ext_resource type="NoiseTexture3D" uid="uid://dm4vqea4an8sx" path="res://Assets/Textures/SceneSD.tres" id="2_hy4ym"]
 [ext_resource type="Script" path="res://Scripts/chunk.gd" id="3_gpe10"]
-[ext_resource type="ImageTexture3D" path="res://Assets/Textures/outtest.tres" id="5_tsyhq"]
-[ext_resource type="ImageTexture3D" path="res://Assets/Textures/Vase.tres" id="6_f72qc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4sbdb"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -41,7 +38,6 @@ shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 75
 shader_parameter/tolerance = 0.07
 shader_parameter/base_col = Color(0.54099, 0.54099, 0.54099, 1)
-shader_parameter/SceneScalarField = ExtResource("2_hy4ym")
 shader_parameter/SceneTex = SubResource("NoiseTexture3D_gvduc")
 
 [sub_resource type="BoxMesh" id="BoxMesh_0ccva"]
@@ -58,7 +54,6 @@ shader_parameter/minStep = -0.001
 shader_parameter/stepCount = 65
 shader_parameter/tolerance = 0.077
 shader_parameter/base_col = Color(0.513217, 0.642933, 0.700388, 1)
-shader_parameter/SceneScalarField = ExtResource("5_tsyhq")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jkgym"]
 render_priority = 0
@@ -68,7 +63,6 @@ shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 50
 shader_parameter/tolerance = 0.062
 shader_parameter/base_col = Color(0.779932, 0.482357, 0, 1)
-shader_parameter/SceneScalarField = ExtResource("6_f72qc")
 
 [node name="Main" type="Node3D"]
 
