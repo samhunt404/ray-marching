@@ -24,6 +24,7 @@ shader_parameter/smoothing = 2.0
 shader_parameter/minStep = 0.001
 shader_parameter/stepCount = 250
 shader_parameter/tolerance = 0.05
+shader_parameter/lod = 0.5
 shader_parameter/base_col = Color(1, 1, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_hekfp"]
@@ -37,6 +38,7 @@ script = ExtResource("1_tlswa")
 imageSize = 32
 camera = NodePath("Camera3D")
 cubeMesh = NodePath("MeshInstance3D")
+textEditPath = NodePath("CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/FileName")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -78,6 +80,16 @@ layout_mode = 2
 text = "Erase
 "
 
+[node name="Save" type="Button" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Save"
+
+[node name="FileName" type="TextEdit" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+placeholder_text = "File Name"
+scroll_fit_content_height = true
+
 [node name="ColorPicker" type="ColorPicker" parent="CanvasLayer/Control/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 color_mode = 3
@@ -115,5 +127,6 @@ script = ExtResource("1_7eqvu")
 [connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/CubeBrush" to="." method="_set_square"]
 [connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/SphereButton" to="." method="_set_sphere"]
 [connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/Erase" to="." method="_set_eraser"]
+[connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/HBoxContainer/Save" to="." method="_save_image"]
 [connection signal="color_changed" from="CanvasLayer/Control/HBoxContainer/VBoxContainer/ColorPicker" to="." method="_set_color"]
 [connection signal="value_changed" from="CanvasLayer/Control/HBoxContainer/VSlider" to="." method="_set_brush_size"]

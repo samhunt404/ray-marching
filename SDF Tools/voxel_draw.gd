@@ -6,6 +6,7 @@ const RAYLENGTH = 1000.0
 @export var imageSize : int
 @export_node_path("Camera3D") var camera
 @export_node_path("MeshInstance3D") var cubeMesh
+@export_node_path("TextEdit") var textEditPath
 
 @onready var activeCam : Camera3D = get_node(camera)
 @onready var activeMesh : MeshInstance3D = get_node(cubeMesh)
@@ -146,11 +147,8 @@ func _physics_process(_delta: float) -> void:
 			return
 		var drawPos : Vector3 = result.position
 		#set a distance
-			
+		
 		_march(drawPos,(drawPos - query.from).normalized())
-
-func _exit_tree() -> void:
-	ResourceSaver.save(SceneTex,"res://Assets/Textures/WriteTest.tres")
 	
 func _march(pos : Vector3,dir : Vector3) -> void:
 	var result := false
@@ -213,3 +211,9 @@ func _set_eraser() -> void:
 func _set_color(newCol : Color) -> void:
 	brushColor = newCol
 	
+
+func _save_image() -> void:
+	var inputName : TextEdit = get_node(textEditPath)
+	if(inputName.text.is_empty()):
+		return
+	ResourceSaver.save(SceneTex,"res://Assets/Textures/" + inputName.text + ".tres")

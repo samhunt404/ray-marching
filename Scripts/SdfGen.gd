@@ -7,7 +7,7 @@ var imgArr = Array([])
 
 func _ready() -> void:
 	for z in range(size):
-		var img = Image.create(size,size,false,Image.FORMAT_L8)
+		var img = Image.create(size,size,false,Image.FORMAT_RGBA8)
 		img.crop(size,size)
 		imgArr.append(img)
 	
@@ -37,7 +37,7 @@ func _increment_pixel(i : int) ->void:
 
 	if(count >= (size * size * size)):
 		var outTex := ImageTexture3D.new()
-		outTex.create(Image.FORMAT_L8,size,size,size,false,imgArr)
+		outTex.create(Image.FORMAT_RGBA8,size,size,size,false,imgArr)
 		ResourceSaver.save(outTex,"res://outtest.tres")
 		print("saved_image")
 		

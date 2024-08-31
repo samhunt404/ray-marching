@@ -4,7 +4,7 @@ uniform float smoothing = 8.0;
 uniform float minStep =  0.001;
 uniform int stepCount = 100;
 uniform float tolerance = 0.01;
-
+uniform float lod = 0.5;
 uniform vec3 base_col : source_color;
 
 uniform sampler2D depth_texture : hint_depth_texture;
@@ -30,7 +30,7 @@ float sceneSDF(vec3 p)
 	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
 	float clip = float(max(max(adjP.x,adjP.y),adjP.z) < 1.0 && min(min(adjP.x,adjP.y),adjP.z) > 0.0);
 	//convert p from object to texture space
-	float raw = texture(SceneTex,adjP,1.0).a;
+	float raw = textureLod(SceneTex,adjP,lod).a;
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
 	float signed = (raw) * clip + (0.5 - clip);
 	signed *= 2.0;
@@ -97,7 +97,7 @@ void fragment() {
 		currStep += int(!overshot);
 
 	}
-	vec3 color = texture(SceneTex,(pixel_position + 1.0)/2.0).rgb * base_col;
+	vec3 color = textureLod(SceneTex,(pixel_position + 1.0)/2.0,lod).rgb * base_col;
 
 	NORMAL = (VIEW_MATRIX * MODEL_MATRIX * vec4(sceneNormal(pixel_position),0.0)).xyz;
 	//alpha to hide parts of mesh which shouldn't be visible (other ways of doing this may be better)

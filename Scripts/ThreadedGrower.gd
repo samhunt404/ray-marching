@@ -65,8 +65,8 @@ func _write_texture() -> void:
 		dis = dis + 0.5
 	else:
 		dis = 0.5 - dis
-	var color = Color.WHITE
-	color.v = dis
+	var color = Color.BLACK
+	color.a = dis
 	tex.set_pixel(coord.x,coord.y,color)
 	pixelReady.emit(index)
 
