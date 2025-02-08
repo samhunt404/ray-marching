@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://debmbcirmpccr"]
 
-[ext_resource type="Script" path="res://Scripts/ThreadedGrower.gd" id="1_svhx1"]
+[ext_resource type="Script" path="res://Scripts/SceneScripts/ThreadedGrower.gd" id="1_svhx1"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_g7j4a"]
 size = Vector3(0.03, 0.03, 0.03)

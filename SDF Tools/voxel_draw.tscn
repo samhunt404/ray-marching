@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://cgb0tmgxlxf7x"]
 
-[ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="1_7eqvu"]
+[ext_resource type="Script" path="res://Scripts/SceneScripts/CameraControl.gd" id="1_7eqvu"]
 [ext_resource type="Script" path="res://SDF Tools/voxel_draw.gd" id="1_tlswa"]
 [ext_resource type="Shader" path="res://Scripts/Shaders/RayMarch.gdshader" id="3_452c3"]
 

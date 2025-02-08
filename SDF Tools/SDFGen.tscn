@@ -1,9 +1,9 @@
 [gd_scene load_steps=9 format=3 uid="uid://4etsegfulmml"]
 
-[ext_resource type="Script" path="res://Scripts/SdfGen.gd" id="1_phqpw"]
+[ext_resource type="Script" path="res://Scripts/SceneScripts/SdfGen.gd" id="1_phqpw"]
 [ext_resource type="PackedScene" uid="uid://debmbcirmpccr" path="res://SDF Tools/GrowTest.tscn" id="2_xkxj8"]
 [ext_resource type="ArrayMesh" uid="uid://dg501rmtwrogy" path="res://Assets/Models/teapot.obj" id="4_4avs0"]
-[ext_resource type="Script" path="res://Scripts/CameraControl.gd" id="4_7fx5p"]
+[ext_resource type="Script" path="res://Scripts/SceneScripts/CameraControl.gd" id="4_7fx5p"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f0itx"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
