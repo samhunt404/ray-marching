@@ -28,14 +28,11 @@ float sceneSDF(vec3 p)
 {
 	vec3 adjP = p+vec3(0.5);
 	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
-	float clip = float(max(max(adjP.x,adjP.y),adjP.z) < 1.0 && min(min(adjP.x,adjP.y),adjP.z) > 0.0);
+	adjP = clamp(adjP,vec3(0.0),vec3(1.0));
 	//convert p from object to texture space
 	float raw = textureLod(SceneTex,adjP,lod).a;
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
-	float signed = (raw) * clip + (0.5 - clip);
-	signed *= 2.0;
-	//I imagine you can scale this signed value and it just scales the litteral size of the scene, though I don't know that to be true
-
+	float signed = (1.0-raw);
 	return signed;
 }
 vec3 sceneNormal(vec3 p)

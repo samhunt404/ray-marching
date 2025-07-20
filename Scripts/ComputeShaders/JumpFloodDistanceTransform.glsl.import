@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://cwlueviuwr2tl"
+path="res://.godot/imported/JumpFloodDistanceTransform.glsl-e26d749b3478bba88a33d50b4f6d1eaa.res"
+
+[deps]
+
+source_file="res://Scripts/ComputeShaders/JumpFloodDistanceTransform.glsl"
+dest_files=["res://.godot/imported/JumpFloodDistanceTransform.glsl-e26d749b3478bba88a33d50b4f6d1eaa.res"]
+
+[params]
+
