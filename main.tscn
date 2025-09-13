@@ -313,11 +313,11 @@ _images = Array[Image]([SubResource("Image_0xm2m"), SubResource("Image_h2yge"), 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_e3y24"]
 render_priority = 0
 shader = ExtResource("1_eaepd")
-shader_parameter/smoothing = 8.0
+shader_parameter/smoothing = 0.495
 shader_parameter/minStep = 0.001
-shader_parameter/stepCount = 100
+shader_parameter/stepCount = 99
 shader_parameter/tolerance = 0.01
-shader_parameter/lod = 0.5
+shader_parameter/lod = 1.0
 shader_parameter/base_col = Color(0.834614, 0.834614, 0.834614, 1)
 shader_parameter/SceneTex = SubResource("ImageTexture3D_hhd5w")
 
@@ -651,7 +651,7 @@ _data = {
 [node name="Main" type="Node3D"]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.763292, 0.579494, -0.285606, 0.33893, 0.0171775, 0.940655, 0.55001, -0.814795, -0.183296, 20.9462, 8.98956, 0)
+transform = Transform3D(0.698367, 0.569072, -0.434097, 0.458009, 0.110749, 0.882022, 0.55001, -0.814795, -0.183297, -1.24722, 8.98956, 0)
 light_color = Color(1, 0.917647, 0.752941, 1)
 light_energy = 0.895
 light_angular_distance = 5.6

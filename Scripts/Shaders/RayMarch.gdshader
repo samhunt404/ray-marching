@@ -1,6 +1,6 @@
 shader_type spatial;
 
-uniform float smoothing = 8.0;
+uniform float smoothing = 0.2;
 uniform float minStep =  0.001;
 uniform int stepCount = 100;
 uniform float tolerance = 0.01;
@@ -10,27 +10,22 @@ uniform vec3 base_col : source_color;
 uniform sampler2D depth_texture : hint_depth_texture;
 uniform sampler3D SceneTex : filter_nearest;
 
-float sdfSphere(vec3 point, vec3 sphere_position, float sphere_scale)
-{
-	return distance(point,sphere_position) - sphere_scale;
-}
-float sdTorus( vec3 p, vec2 t )
-{
-  vec2 q = vec2(length(p.xz)-t.x,p.y);
-  return length(q)-t.y;
-}
-float sdfCube(vec3 p,vec3 o,float scale)
-{
-	float adj = max(max(abs(p.x-o.x),abs(p.y-o.y)),abs(p.z-o.z));
-	return adj - scale;
-}
 float sceneSDF(vec3 p)
 {
 	vec3 adjP = p+vec3(0.5);
-	//clipping value, 0 if outside boudns, 1 if in. prevents scene from tiling infinitely
-	adjP = clamp(adjP,vec3(0.0),vec3(1.0));
 	//convert p from object to texture space
 	float raw = textureLod(SceneTex,adjP,lod).a;
+	//declaring bounds between 0 and 1
+	if(adjP.x <= 0.0 ||
+	 adjP.y <= 0.0 ||
+	 adjP.z <= 0.0 ||
+	 adjP.x >=1.0 ||
+	 adjP.y >= 1.0 ||
+	 adjP.z >= 1.0)
+	{
+		raw = 0.0;
+	}
+	
 	//clip+1.0-clip should just be 1 always but just multiplying it by 1 doesn't work so...
 	float signed = (1.0-raw);
 	return signed;
@@ -56,6 +51,7 @@ vec3 sceneNormal(vec3 p)
 	norm = clamp(norm,-1.0,1.0);
 	return norm;
 }
+
 void vertex() {
 	//POSITION = vec4(VERTEX,0.0);
 }
@@ -88,7 +84,9 @@ void fragment() {
 
 
 		//pixel_position +=  -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * 0.001;
-		pixel_position += (view_dir * max(sd,minStep) * shouldEnd);
+		vec3 ray = (view_dir * max(sd,minStep) * shouldEnd);
+		
+		pixel_position += ray;
 		trueDepth += sd * shouldEnd;
 		//pixel_position += -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * sd;
 		currStep += int(!overshot);
