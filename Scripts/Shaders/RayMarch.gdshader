@@ -5,6 +5,7 @@ uniform float minStep =  0.001;
 uniform int stepCount = 100;
 uniform float tolerance = 0.01;
 uniform float lod = 0.5;
+uniform ivec3 resolution = ivec3(21);
 uniform vec3 base_col : source_color;
 
 uniform sampler2D depth_texture : hint_depth_texture;
@@ -56,6 +57,78 @@ void vertex() {
 	//POSITION = vec4(VERTEX,0.0);
 }
 
+vec3 round_to_resolution(vec3 position)
+{
+	return round(position / vec3(resolution)) * vec3(resolution);
+}
+float raycast(vec3 dir,vec3 pos)
+{
+	vec3 dir_rad = dir * PI;
+	vec3 cursor_position = pos;
+	int curr_step = 0;
+	float true_depth = 0.0;
+	bool overshot;
+	bool hit;
+	float should_end = 1.0;
+	
+	for(int i = 0; i < stepCount;i++)
+	{
+		float distance_read = sceneSDF(cursor_position);
+		overshot = distance_read > 256.0; //arbitrarily large value
+		hit = abs(distance_read) <  tolerance;
+		
+		should_end = float(!(overshot || hit));
+		
+		//pixel_position +=  -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * 0.001;
+		vec3 ray = (dir * max(distance_read,minStep) * should_end);
+		
+		cursor_position += ray;
+		curr_step += int(!overshot);	
+	}
+	float zvalue;
+	float yvalue;
+	float xvalue;
+	
+	//sample z walls
+	vec3 cursor_position_z = cursor_position;
+	cursor_position_z.z = round_to_resolution(cursor_position_z).z;
+	cursor_position_z.x = (atan(dir.z/-dir.x)) + cursor_position_z.x;
+	cursor_position_z.y = (atan(dir.z/-dir.y)) + cursor_position_z.y;
+	
+	//sample y walls
+	vec3 cursor_position_y = cursor_position;
+	cursor_position_y.y = round_to_resolution(cursor_position_y).y;
+	cursor_position_y.x = (atan(dir.y/-dir.x)) + cursor_position_y.x;
+	cursor_position_y.z = (atan(dir.y/-dir.z)) + cursor_position_y.z;
+	
+	//sample x walls
+	vec3 cursor_position_x = cursor_position;
+	cursor_position_x.x = round_to_resolution(cursor_position_x).x;
+	cursor_position_x.y = (atan(dir.x/-dir.y)) + cursor_position_x.y;
+	cursor_position_x.z = (atan(dir.x/-dir.z)) + cursor_position_x.z;
+	
+	float disx = distance(cursor_position,cursor_position_x);
+	float disy = distance(cursor_position,cursor_position_y);
+	float disz = distance(cursor_position,cursor_position_z);
+	
+	float minDis = min(min(disx,disy),disz);
+	
+	//also tells us normal
+	if(minDis == disx)
+	{
+		cursor_position = cursor_position_x;
+	}
+	if(minDis == disy)
+	{
+		cursor_position = cursor_position_y;
+	}
+	if(minDis == disz)
+	{
+		cursor_position = cursor_position_z;
+	}
+	
+	return distance(cursor_position_z,pos);
+}
 void fragment() {
 	float depth = texture(depth_texture, SCREEN_UV).x;
 	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth * 2.0 - 1.0);
@@ -74,6 +147,9 @@ void fragment() {
 	bool overshot;
 	bool undershot;
 	float shouldEnd = 1.0;
+	
+	vec3 view_rad = (view_dir + vec3(1.0)) * 0.5 * PI;
+	
 	for(int i = 0;i<stepCount;i++)
 	{
 		//float sd = sceneSDF(pixel_position);
@@ -81,29 +157,26 @@ void fragment() {
 		overshot = sd > 256.0; //arbitrarily large value
 		undershot = abs(sd) < tolerance; //arbitrarily small value
 		shouldEnd = float(!(overshot || undershot)); //1 if chill, 0 if not
-
-
+		
 		//pixel_position +=  -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * 0.001;
 		vec3 ray = (view_dir * max(sd,minStep) * shouldEnd);
+		
+		
+		
 		
 		pixel_position += ray;
 		trueDepth += sd * shouldEnd;
 		//pixel_position += -(INV_VIEW_MATRIX * vec4(VIEW,1.0)).xyz * sd;
 		currStep += int(!overshot);
-
 	}
 	vec3 color = textureLod(SceneTex,(pixel_position + 1.0)/2.0,lod).rgb * base_col;
 
 	NORMAL = (VIEW_MATRIX * MODEL_MATRIX * vec4(sceneNormal(pixel_position),0.0)).xyz;
 	//alpha to hide parts of mesh which shouldn't be visible (other ways of doing this may be better)
 	ALPHA = float(undershot);
-	ALBEDO = (color);
+	ALBEDO = color;
 	EMISSION = vec3(float(overshot) * ALBEDO);
+	
 }
 
-void light() {
-	//diffuse
-	DIFFUSE_LIGHT += clamp(dot(NORMAL, LIGHT), 0.0, 1.0) * ATTENUATION * LIGHT_COLOR;
-	//shadow??
-
-}
+// 
